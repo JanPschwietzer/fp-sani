@@ -1,0 +1,160 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  email           String?  @unique
+  password        String?
+  vorname         String?
+  nachname        String?
+
+  accounts        Account[]
+  adress          Adresse?
+  veranstalter    Veranstalter?
+  kaeufe          Kaeufe[]
+  zutrittsberechtigungen Zutrittsberechtigung[]
+}
+
+model Account {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId         String
+  type           String
+  provider       String
+  providerUserId String
+  accessToken    String?  @db.String
+  refreshToken   String?  @db.String
+  expiresAt      DateTime?
+  tokenType      String?
+  scope          String?
+  idToken        String?
+  sessionState   String?
+
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerUserId])
+}
+
+model Veranstalter {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  userId          String   @unique
+  name            String
+  username        String   @unique @default(cuid())
+  beschreibung    String?
+  website         String?
+  telefon         String?
+  email           String?
+  instagramLink   String?
+  facebookLink    String?
+  agbLink         String?
+  authCode        String    @default(cuid())
+  iban            String?
+  bic             String?
+  bank            String?
+  kontoinhaber    String?
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  veranstaltungen Veranstaltungen[]
+}
+
+model Veranstaltungen {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  veranstalterId  String
+  name            String
+  beschreibung    String?
+  bild            String?
+  startDatum      DateTime
+  endDatum        DateTime
+  veroeffentlicht Boolean @default(false)
+
+  land            String
+  ort             String
+  plz             String
+  strasse         String
+  hausnummer      String
+
+  veranstalter    Veranstalter @relation(fields: [veranstalterId], references: [id], onDelete: Cascade)
+  tickets         Ticket[]
+  zugangsberechtigungen Zutrittsberechtigung[]
+}
+
+model Ticket {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  veranstaltungId   String
+  name              String
+  beschreibung      String?
+  preis             Float
+  anzahl            Int
+  startDatum        DateTime
+  ablaufDatum       DateTime
+  anzahlVerkauft    Int
+  anzahlReserviert  Int
+  maximaleAnzahl    Int
+
+  veranstaltung     Veranstaltungen @relation(fields: [veranstaltungId], references: [id], onDelete: Cascade)
+  kaeufe            Kaeufe[]
+  zutrittsberechtigungen Zutrittsberechtigung[]
+}
+
+model Kaeufe {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  userId            String
+  ticketId          String
+  anzahl            Int
+  preis             Float
+  status            String
+
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ticket            Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  zutrittsberechtigung Zutrittsberechtigung[]
+}
+
+model Zutrittsberechtigung {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  userId            String
+  vorname           String?
+  nachname          String?
+  veranstaltungId   String   @db.ObjectId
+  kaufId            String   @db.ObjectId
+  ticketId          String   @db.ObjectId
+  status            String
+
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  veranstaltung     Veranstaltungen @relation(fields: [veranstaltungId], references: [id], onDelete: Cascade)
+  kauf              Kaeufe   @relation(fields: [kaufId], references: [id], onDelete: Cascade)
+  ticket            Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+}
+
+model Adresse {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String?  @unique
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  street          String
+  streetNumber    String
+  zipCode         String
+  city            String
+  country         String
+
+  user            User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

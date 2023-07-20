@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+	background: #FCFFFC;
+	color: #040F0F;
+}
+
+a:hover {
+	color: #2BA84A;
+}
+
+input[type="checkbox"]:checked + label::before {
+	background-color: #2BA84A;
+	border-color: #2BA84A;
+}
