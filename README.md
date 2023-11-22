@@ -19,7 +19,8 @@ Am Anfang des Projektes habe ich ein Pitch, Logo und Farbschema erarbeitet, noti
 
 Daraufhin habe ich eine Anforderungsanalyse an die Datenbank durchgeführt und per ERM modelliert:
 ![Anfängliches ERM Modell](./Datenbankmodell.svg)
-Das Design und die Designentscheidungen habe ich nicht näher beschrieben und während des programmierens der Seite entworfen.
+
+Das Design und die Designentscheidungen habe ich nicht näher beschrieben und während des Programmierens der Seite entworfen.
 Mit besserer Vorheriger Designplanung hätte der Code auf jeden Fall noch um einiges klarer werden können.
 
 Viel Spaß beim ansehen.
